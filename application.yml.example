@@ -1,0 +1,5 @@
+record:
+  file-dir: /PATH/TO/YOUR/RECORD/DIR
+  afreeca:
+    username: YOUR_USERNAME
+    password: YOUR_PASSWORD

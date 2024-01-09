@@ -1,0 +1,19 @@
+server:
+  port: 6060
+spring:
+  datasource:
+    driver-class-name: org.sqlite.JDBC
+    url: jdbc:sqlite:db.sqlite
+    username: st
+    password: st
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  thymeleaf:
+    prefix: classpath:templates/thymeleaf/
+    check-template-location: true
+    suffix: .html
+    mode: HTML
+    cache: false

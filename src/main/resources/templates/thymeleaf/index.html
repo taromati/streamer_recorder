@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>Streamer Recorder</title>
+</head>
+<link rel="icon" type="image/png" th:href="@{/favicon.ico}"/>
+<body>
+<h1>Streamer Recorder</h1>
+
+<div class="container">
+    <form id="form">
+        <select id="platform" name="platform">
+            <option value="TWITCH">TWITCH</option>
+            <option value="CHZZK">CHZZK</option>
+            <option value="AFREECA">AFREECA</option>
+<!--                <option value="YOUTUBE">YOUTUBE</option>-->
+            <option value="TWITCASTING">TWITCASTING</option>
+        </select>
+        <input id="account_id" type="text" name="account_id" placeholder="AccountId">
+        <input id="user_name" type="text" name="user_name" placeholder="userName">
+        <button type="submit">저장</button>
+    </form>
+    <br>
+    <br>
+    <br>
+    <table>
+        <thead>
+        <tr>
+            <th scope="col">플랫폼</th>
+            <th scope="col">Id</th>
+            <th scope="col">스트리머명</th>
+            <th scope="col">녹화 상태</th>
+            <th scope="col">삭제</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!--/*@thymesVar id="streamerList" type="java.util.List"*/-->
+        <tr th:each="streamer : ${streamerList}">
+            <td th:text="${streamer.platform}"></td>
+            <td th:text="${streamer.accountId}"></td>
+            <td th:text="${streamer.userName}"></td>
+            <td th:if="${streamer.status == true}" th:text="녹화중"></td>
+            <td th:if="${streamer.status == false}" th:text="정지"></td>
+            <td>
+                <button id="delete_button" type="button" th:onclick="onClickDelete([[${streamer.platform}]], [[${streamer.accountId}]], [[${streamer.userName}]])">삭제</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+<script>
+    const form = document.getElementById('form');
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const payload = new FormData(form);
+
+        const body = {
+            platform: payload.get("platform"),
+            account_id: payload.get("account_id"),
+            user_name: payload.get("user_name")
+        }
+
+        fetch(window.location.origin + '/streamer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body),
+        })
+            .then(res => res.json())
+            .then(async (data) => {
+                // console.log(data)
+                await window.alert(data.message);
+                if (data.code === "OK") {
+                    window.location.reload();
+                }
+            });
+    });
+
+    function onClickDelete(platform, account_id, user_name) {
+        const body = {
+            platform: platform,
+            account_id: account_id,
+            user_name: user_name
+        }
+
+        fetch(window.location.origin + '/streamer', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body),
+        })
+            .then(res => res.json())
+            .then(async (data) => {
+                // console.log(data)
+                await window.alert(data.message);
+                if (data.code === "OK") {
+                    window.location.reload();
+                }
+            });
+    }
+</script>
+</body>
+</html>
