@@ -11,7 +11,8 @@ Streamer-Recorder를 이용하여 인터넷 방송을 지속적으로 녹화할 
 
 ## **빌드 방법**
 
-1. 터미널에서 `gradlew clean assemble bootJar` 실행
+1. 리눅스/맥 : 터미널에서 `gradlew clean assemble bootJar` 실행
+2. 윈도우    : 터미널에서 `gradlew.bat clean assemble bootJar` 실행
     
 
 ## **실행 방법**
