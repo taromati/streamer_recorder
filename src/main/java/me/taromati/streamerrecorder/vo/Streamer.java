@@ -48,7 +48,8 @@ public class Streamer {
             case CHZZK -> STR."https://chzzk.naver.com/live/\{accountId}";
             case TWITCASTING -> STR."https://twitcasting.tv/\{accountId}";
             case YOUTUBE -> STR."https://www.youtube.com/@\{accountId}";
-            case AFREECA -> STR."https://play.afreecatv.com/\{accountId}";
+//            case AFREECA -> STR."https://play.afreecatv.com/\{accountId}";
+            case AFREECA -> STR."https://play.sooplive.co.kr/\{accountId}";
             default -> throw new IllegalStateException(STR."Unexpected value: \{platform}");
         };
     }
@@ -58,9 +59,9 @@ public class Streamer {
             case TWITCH, TWITCASTING, YOUTUBE -> new String[]{"streamlink", recordUrl(), "best", "-o", makeFilePath(fileDir)};
             case AFREECA -> {
                 if (afreecaOption == null) {
-                    yield new String[]{"streamlink", recordUrl(), "best", "-o", makeFilePath(fileDir)};
+                    yield new String[]{"streamlink", "--plugin-dirs", "./plugins", "--ffmpeg-copyts", recordUrl(), "best", "-o", makeFilePath(fileDir)};
                 } else {
-                    yield new String[]{"streamlink", recordUrl(), "best", "-o", makeFilePath(fileDir), "--afreeca-username", afreecaOption.getUsername(), "--afreeca-password", afreecaOption.getPassword(), "--afreeca-purge-credentials"};
+                    yield new String[]{"streamlink", "--plugin-dirs", "./plugins", "--ffmpeg-copyts", recordUrl(), "best", "-o", makeFilePath(fileDir), "--afreeca-username", afreecaOption.getUsername(), "--afreeca-password", afreecaOption.getPassword(), "--afreeca-purge-credentials"};
                 }
             }
             case CHZZK -> new String[]{"streamlink", "--plugin-dirs", "./plugins", "--ffmpeg-copyts", recordUrl(), "best", "-o", makeFilePath(fileDir)};
