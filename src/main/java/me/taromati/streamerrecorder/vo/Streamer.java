@@ -39,7 +39,7 @@ public class Streamer {
     public String makeFilePath(String fileDir) {
         String dateTimeString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss.SSS"));
 //        return STR."\{fileDir}\{}\{dateTimeString}-\{userName}.ts";
-        return Paths.get(fileDir, userName, STR."\{dateTimeString}-\{userName}.ts").toString();
+        return Paths.get(fileDir, userName, STR."\{dateTimeString}-\{this.platform.name()}-\{userName}.ts").toString();
     }
 
     public String recordUrl() {
