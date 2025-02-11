@@ -6,6 +6,7 @@ public enum Platform {
     AFREECA,
     YOUTUBE,
     TWITCASTING,
+    SOOP,
     ;
 
     public static Platform from(String name) {

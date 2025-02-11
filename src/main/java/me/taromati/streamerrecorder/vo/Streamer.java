@@ -19,17 +19,17 @@ public class Streamer {
     private final String accountId;
     private final String userName;
 
-    private final AfreecaOption afreecaOption;
+    private final SoopOption soopOption;
 
     @Setter
     private Process process;
 
     @Builder
-    public Streamer(Platform platform, String accountId, String userName, AfreecaOption afreecaOption) {
+    public Streamer(Platform platform, String accountId, String userName, SoopOption soopOption) {
         this.platform = platform;
         this.accountId = accountId;
         this.userName = userName;
-        this.afreecaOption = afreecaOption;
+        this.soopOption = soopOption;
     }
 
     public boolean getStatus() {
@@ -50,6 +50,7 @@ public class Streamer {
             case YOUTUBE -> STR."https://www.youtube.com/@\{accountId}";
 //            case AFREECA -> STR."https://play.afreecatv.com/\{accountId}";
             case AFREECA -> STR."https://play.sooplive.co.kr/\{accountId}";
+            case SOOP -> STR."https://play.sooplive.co.kr/\{accountId}";
             default -> throw new IllegalStateException(STR."Unexpected value: \{platform}");
         };
     }
@@ -57,11 +58,11 @@ public class Streamer {
     public String[] getCommand(String fileDir) {
         return switch (platform) {
             case TWITCH, TWITCASTING, YOUTUBE -> new String[]{"streamlink", recordUrl(), "best", "-o", makeFilePath(fileDir)};
-            case AFREECA -> {
-                if (afreecaOption == null) {
-                    yield new String[]{"streamlink", "--plugin-dirs", "./plugins", "--ffmpeg-copyts", recordUrl(), "best", "-o", makeFilePath(fileDir)};
+            case AFREECA, SOOP -> {
+                if (soopOption == null) {
+                    yield new String[]{"streamlink", "--ffmpeg-copyts", recordUrl(), "best", "-o", makeFilePath(fileDir)};
                 } else {
-                    yield new String[]{"streamlink", "--plugin-dirs", "./plugins", "--ffmpeg-copyts", recordUrl(), "best", "-o", makeFilePath(fileDir), "--afreeca-username", afreecaOption.getUsername(), "--afreeca-password", afreecaOption.getPassword(), "--afreeca-purge-credentials"};
+                    yield new String[]{"streamlink", "--ffmpeg-copyts", recordUrl(), "best", "-o", makeFilePath(fileDir), "--soop-username", soopOption.getUsername(), "--soop-password", soopOption.getPassword(), "--soop-purge-credentials"};
                 }
             }
             case CHZZK -> new String[]{"streamlink", "--plugin-dirs", "./plugins", "--ffmpeg-copyts", recordUrl(), "best", "-o", makeFilePath(fileDir)};

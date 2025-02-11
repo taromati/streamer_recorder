@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class AfreecaOption {
+public class SoopOption {
     private String username;
     private String password;
 }

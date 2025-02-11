@@ -10,7 +10,7 @@ import me.taromati.streamerrecorder.common.exception.ApiException;
 import me.taromati.streamerrecorder.common.response.ResponseCode;
 import me.taromati.streamerrecorder.db.entity.StreamerEntity;
 import me.taromati.streamerrecorder.db.repository.StreamerRepository;
-import me.taromati.streamerrecorder.vo.AfreecaOption;
+import me.taromati.streamerrecorder.vo.SoopOption;
 import me.taromati.streamerrecorder.vo.Platform;
 import me.taromati.streamerrecorder.vo.Streamer;
 import org.springframework.data.domain.Sort;
@@ -34,9 +34,9 @@ public class StreamerManager {
     @PostConstruct
     private void init() {
         log.info("[StreamerManager] init start");
-        AfreecaOption afreecaOption = Optional.ofNullable(recordConfig.getAfreeca())
+        SoopOption soopOption = Optional.ofNullable(recordConfig.getSoop())
                 .filter(afreeca -> (afreeca.getUsername() != null && !afreeca.getUsername().isEmpty()) && (afreeca.getPassword() != null && !afreeca.getPassword().isEmpty()))
-                .map(afreeca -> AfreecaOption.builder()
+                .map(afreeca -> SoopOption.builder()
                         .username(afreeca.getUsername())
                         .password(afreeca.getPassword())
                         .build())
@@ -47,7 +47,7 @@ public class StreamerManager {
                         .platform(Platform.from(streamerEntity.getPlatform()))
                         .accountId(streamerEntity.getAccountId())
                         .userName(streamerEntity.getUserName())
-                        .afreecaOption(afreecaOption)
+                        .soopOption(soopOption)
                         .build()
                 )
                 .forEach(streamerList::add);

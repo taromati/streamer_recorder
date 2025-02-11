@@ -11,10 +11,10 @@ public class RecordConfig {
 
     private String fileDir;
 
-    private Afreeca afreeca;
+    private Soop soop;
 
     @Data
-    public static class Afreeca {
+    public static class Soop {
         private String username;
         private String password;
     }
