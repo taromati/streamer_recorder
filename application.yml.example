@@ -1,5 +1,9 @@
+discord:
+  token:
+  server-name:
+  channel-name:
 record:
   file-dir: /PATH/TO/YOUR/RECORD/DIR
-  afreeca:
+  soop:
     username: YOUR_USERNAME
     password: YOUR_PASSWORD

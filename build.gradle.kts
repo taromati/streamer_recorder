@@ -32,7 +32,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-quartz")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 
-    implementation("com.google.guava:guava:32.0.0-android")
+    implementation("com.google.guava:guava:33.4.0-jre")
+    implementation("net.dv8tion:JDA:5.3.0")
 
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.xerial:sqlite-jdbc:3.41.2.2")
