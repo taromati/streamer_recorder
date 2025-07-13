@@ -33,6 +33,10 @@
                     <label for="user_name" class="form-label">userName</label>
                     <input id="user_name" type="text" name="user_name" class="form-control" placeholder="userName">
                 </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="useYn" name="useYn" checked>
+                    <label class="form-check-label" for="useYn">녹화 활성화</label>
+                </div>
                 <button type="submit" class="btn btn-primary w-100">저장</button>
             </form>
         </div>
@@ -47,19 +51,27 @@
             <th scope="col">Id</th>
             <th scope="col">스트리머명</th>
             <th scope="col">녹화 상태</th>
+            <th scope="col">녹화 ON/OFF</th>
             <th scope="col">삭제</th>
         </tr>
         </thead>
         <tbody>
-        <!--/*@thymesVar id="streamerList" type="java.util.List"*/-->
         <tr th:each="streamer : ${streamerList}">
             <td th:text="${streamer.platform}"></td>
             <td th:text="${streamer.accountId}"></td>
             <td th:text="${streamer.userName}"></td>
-            <td th:if="${streamer.status == true}" th:text="녹화중"></td>
-            <td th:if="${streamer.status == false}" th:text="정지"></td>
+            <td th:text="${streamer.status ? '녹화중' : '대기'}"></td>
             <td>
-                <button id="delete_button" type="button" th:onclick="onClickDelete([[${streamer.platform}]], [[${streamer.accountId}]], [[${streamer.userName}]])" class="btn btn-danger btn-sm">삭제</button>
+                <button type="button"
+                        th:classappend="${streamer.useYn == 'Y'} ? 'btn btn-success btn-sm' : 'btn btn-secondary btn-sm'"
+                        th:text="${streamer.useYn == 'Y'} ? '녹화 ON' : '녹화 OFF'"
+                        th:attr="onclick=|onClickToggleRecord('${streamer.platform}', '${streamer.accountId}', '${streamer.userName}')|">
+                </button>
+            </td>
+            <td>
+                <button id="delete_button" type="button"
+                        th:attr="onclick=|onClickDelete('${streamer.platform}', '${streamer.accountId}', '${streamer.userName}')|"
+                        class="btn btn-danger btn-sm">삭제</button>
             </td>
         </tr>
         </tbody>
@@ -78,7 +90,8 @@
         const body = {
             platform: payload.get("platform"),
             account_id: payload.get("account_id"),
-            user_name: payload.get("user_name")
+            user_name: payload.get("user_name"),
+            useYn: document.getElementById("useYn").checked ? "Y" : "N"
         }
 
         fetch(window.location.origin + '/streamer', {
@@ -119,6 +132,26 @@
                 if (data.code === "OK") {
                     window.location.reload();
                 }
+            });
+    }
+
+    function onClickToggleRecord(platform, account_id, user_name) {
+        const body = {
+            platform: platform,
+            account_id: account_id,
+            user_name: user_name
+        }
+        fetch(window.location.origin + '/streamer/toggle-record', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body),
+        })
+            .then(res => res.json())
+            .then(async (data) => {
+                await window.alert('녹화 상태가 변경되었습니다.');
+                window.location.reload();
             });
     }
 </script>

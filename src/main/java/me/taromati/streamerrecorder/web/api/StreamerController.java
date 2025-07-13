@@ -33,6 +33,7 @@ public class StreamerController {
                 .platform(Platform.from(request.getPlatform()))
                 .accountId(request.getAccountId())
                 .userName(request.getUserName())
+                .useYn(request.getUseYn() != null ? request.getUseYn() : "Y")
                 .build();
         streamerManager.add(streamer);
         return RootResponse.ok();
@@ -48,6 +49,19 @@ public class StreamerController {
                 .userName(request.getUserName())
                 .build();
         streamerManager.delete(streamer);
+        return RootResponse.ok();
+    }
+
+    @PostMapping("/toggle-record")
+    public RootResponse<Void> toggleRecordEnabled(
+            @Valid @RequestBody StreamerRequest request
+    ) {
+        Streamer streamer = Streamer.builder()
+                .platform(Platform.from(request.getPlatform()))
+                .accountId(request.getAccountId())
+                .userName(request.getUserName())
+                .build();
+        streamerManager.toggleUseYn(streamer);
         return RootResponse.ok();
     }
 }

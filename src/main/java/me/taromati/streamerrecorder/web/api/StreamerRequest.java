@@ -14,4 +14,5 @@ public class StreamerRequest {
     private String accountId;
     @NotBlank
     private String userName;
+    private String useYn;
 }

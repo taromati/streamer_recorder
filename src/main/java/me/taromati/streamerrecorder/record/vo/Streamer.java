@@ -15,6 +15,7 @@ import java.util.Arrays;
 
 @Slf4j
 @Getter
+@Setter
 @JsonIgnoreProperties(value = {"process"})
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class Streamer {
@@ -25,11 +26,15 @@ public class Streamer {
     @Setter
     private Process process;
 
+    @Setter
+    private String useYn;
+
     @Builder
-    public Streamer(Platform platform, String accountId, String userName) {
+    public Streamer(Platform platform, String accountId, String userName, String useYn) {
         this.platform = platform;
         this.accountId = accountId;
         this.userName = userName;
+        this.useYn = useYn;
     }
 
     public boolean getStatus() {

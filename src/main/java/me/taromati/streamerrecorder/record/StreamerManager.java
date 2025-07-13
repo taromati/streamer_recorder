@@ -32,6 +32,7 @@ public class StreamerManager {
                         .platform(Platform.from(streamerEntity.getPlatform()))
                         .accountId(streamerEntity.getAccountId())
                         .userName(streamerEntity.getUserName())
+                        .useYn(streamerEntity.getUseYn())
                         .build())
                 .forEach(streamerList::add);
         log.info("[StreamerManager] init end");
@@ -47,9 +48,25 @@ public class StreamerManager {
                         .platform(streamer.getPlatform().toString())
                         .accountId(streamer.getAccountId())
                         .userName(streamer.getUserName())
-                        .useYn("Y")
+                        .useYn(streamer.getUseYn())
                         .build());
         streamerList.add(streamer);
+    }
+
+    public void toggleUseYn(Streamer streamer) {
+        StreamerEntity streamerEntity = streamerRepository.findByPlatformAndAccountId(streamer.getPlatform().toString(), streamer.getAccountId())
+                .orElseThrow(() -> new ApiException(ResponseCode.INVALID_PARAMETER));
+        String newValue = "Y".equals(streamerEntity.getUseYn()) ? "N" : "Y";
+        streamerEntity.setUseYn(newValue);
+        streamerRepository.save(streamerEntity);
+        streamerList.stream()
+                .filter(s -> s.getPlatform().equals(streamer.getPlatform()) && s.getAccountId().equals(streamer.getAccountId()))
+                .findFirst()
+                .ifPresent(s -> s.setUseYn(newValue));
+    }
+
+    public boolean isUseYn(Streamer streamer) {
+        return streamer.getUseYn() != null && streamer.getUseYn().equals("Y");
     }
 
     public void delete(Streamer streamer) {

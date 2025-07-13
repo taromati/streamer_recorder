@@ -26,6 +26,10 @@ public class RecordScheduler {
         log.info("[RecordScheduler] {}", "##################################################");
         List<Streamer> streamerList = streamerManager.getStreamerList();
         for (Streamer streamer : streamerList) {
+            // useYn이 'Y'인 스트리머만 녹화 시도
+            if ((!streamerManager.isUseYn(streamer))) {
+                continue;
+            }
             // 녹화중이 아닌 스트리머만 처리
             if (streamer.getProcess() == null || streamer.getProcess().isAlive() == false) {
                 Thread.startVirtualThread(() -> {
