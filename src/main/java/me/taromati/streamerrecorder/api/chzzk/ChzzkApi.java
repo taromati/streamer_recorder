@@ -76,6 +76,7 @@ public class ChzzkApi {
                 return null;
             }
         } catch (Exception e) {
+            log.error("[ChzzkApi] Live Check Error: {}, {}", id, e.getMessage());
             return null;
         }
     }
