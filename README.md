@@ -43,7 +43,7 @@ Streamer-Recorder를 이용하여 인터넷 방송을 지속적으로 녹화할 
 1. [http://localhost:6060](http://localhost:6060) 혹은 [http://127.0.0.1:6060](http://127.0.0.1:6060) 접속
 2. 녹화할 스트리머 정보 입력 후 저장
    ```
-   플랫폼 종류: CHZZK, AFREECA, TWITCASTING, TWITCH
+   플랫폼 종류: CHZZK, SOOP, TWITCASTING, TWITCH
    user_id: 각 플랫폼별 스트리머 고유값
    user_name: 녹화 파일에 넣을 스트리머명
    ```

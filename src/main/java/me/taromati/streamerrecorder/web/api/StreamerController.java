@@ -48,7 +48,7 @@ public class StreamerController {
                 .accountId(request.getAccountId())
                 .userName(request.getUserName())
                 .build();
-        streamerManager.delete(streamer);
+        streamerManager.deleteByAccountId(streamer);
         return RootResponse.ok();
     }
 
@@ -61,7 +61,7 @@ public class StreamerController {
                 .accountId(request.getAccountId())
                 .userName(request.getUserName())
                 .build();
-        streamerManager.toggleUseYn(streamer);
+        streamerManager.toggleUseYnByAccountId(streamer);
         return RootResponse.ok();
     }
 }

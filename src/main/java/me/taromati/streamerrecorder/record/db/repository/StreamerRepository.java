@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface StreamerRepository extends JpaRepository<StreamerEntity, Integer>, JpaSpecificationExecutor<StreamerEntity> {
 
     Optional<StreamerEntity> findByPlatformAndAccountId(String platform, String accountId);
+    Optional<StreamerEntity> findByPlatformAndUserName(String platform, String userName);
 }

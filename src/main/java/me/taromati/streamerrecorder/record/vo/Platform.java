@@ -1,11 +1,11 @@
 package me.taromati.streamerrecorder.record.vo;
 
 public enum Platform {
-    TWITCH,
     CHZZK,
-    YOUTUBE,
-    TWITCASTING,
     SOOP,
+    TWITCASTING,
+    TWITCH,
+//    YOUTUBE,
     ;
 
     public static Platform from(String name) {

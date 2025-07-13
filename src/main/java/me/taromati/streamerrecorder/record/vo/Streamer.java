@@ -52,7 +52,6 @@ public class Streamer {
             case TWITCH -> STR."twitch.tv/\{accountId}";
             case CHZZK -> STR."https://chzzk.naver.com/live/\{accountId}";
             case TWITCASTING -> STR."https://twitcasting.tv/\{accountId}";
-            case YOUTUBE -> STR."https://www.youtube.com/@\{accountId}";
             case SOOP -> STR."https://play.sooplive.co.kr/\{accountId}";
             default -> throw new IllegalStateException(STR."Unexpected value: \{platform}");
         };
@@ -60,7 +59,7 @@ public class Streamer {
 
     public String[] getCommand(String fileDir, SoopOption soopOption) {
         String[] command = switch (platform) {
-            case TWITCH, TWITCASTING, YOUTUBE -> new String[]{"streamlink", recordUrl(), "best", "-o", makeFilePath(fileDir)};
+            case TWITCH, TWITCASTING -> new String[]{"streamlink", recordUrl(), "best", "-o", makeFilePath(fileDir)};
             case SOOP -> {
                 if (soopOption == null) {
                     yield new String[]{"streamlink", "--ffmpeg-copyts", recordUrl(), "best", "-o", makeFilePath(fileDir)};

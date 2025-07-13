@@ -42,7 +42,7 @@ public class StreamerManager {
         StreamerEntity streamerEntity = streamerRepository.findByPlatformAndAccountId(streamer.getPlatform().toString(), streamer.getAccountId())
                 .orElse(null);
         if (streamerEntity != null) {
-            throw new ApiException(ResponseCode.INVALID_PARAMETER);
+            throw new ApiException(ResponseCode.ALREADY_EXISTS);
         }
         streamerRepository.save(StreamerEntity.builder()
                         .platform(streamer.getPlatform().toString())
@@ -53,9 +53,9 @@ public class StreamerManager {
         streamerList.add(streamer);
     }
 
-    public void toggleUseYn(Streamer streamer) {
+    public void toggleUseYnByAccountId(Streamer streamer) {
         StreamerEntity streamerEntity = streamerRepository.findByPlatformAndAccountId(streamer.getPlatform().toString(), streamer.getAccountId())
-                .orElseThrow(() -> new ApiException(ResponseCode.INVALID_PARAMETER));
+                .orElseThrow(() -> new ApiException(ResponseCode.STREAMER_NOT_FOUND));
         String newValue = "Y".equals(streamerEntity.getUseYn()) ? "N" : "Y";
         streamerEntity.setUseYn(newValue);
         streamerRepository.save(streamerEntity);
@@ -65,16 +65,48 @@ public class StreamerManager {
                 .ifPresent(s -> s.setUseYn(newValue));
     }
 
+    public void onUseYnByUserName(Streamer streamer) {
+        StreamerEntity streamerEntity = streamerRepository.findByPlatformAndUserName(streamer.getPlatform().toString(), streamer.getUserName())
+                .orElseThrow(() -> new ApiException(ResponseCode.STREAMER_NOT_FOUND));
+        streamerEntity.setUseYn("Y");
+        streamerRepository.save(streamerEntity);
+        streamerList.stream()
+                .filter(s -> s.getPlatform().equals(streamer.getPlatform()) && s.getUserName().equals(streamer.getUserName()))
+                .findFirst()
+                .ifPresent(s -> s.setUseYn("Y"));
+    }
+
+    public void offUseYnByUserName(Streamer streamer) {
+        StreamerEntity streamerEntity = streamerRepository.findByPlatformAndUserName(streamer.getPlatform().toString(), streamer.getUserName())
+                .orElseThrow(() -> new ApiException(ResponseCode.STREAMER_NOT_FOUND));
+        streamerEntity.setUseYn("N");
+        streamerRepository.save(streamerEntity);
+        streamerList.stream()
+                .filter(s -> s.getPlatform().equals(streamer.getPlatform()) && s.getUserName().equals(streamer.getUserName()))
+                .findFirst()
+                .ifPresent(s -> s.setUseYn("N"));
+    }
+
     public boolean isUseYn(Streamer streamer) {
         return streamer.getUseYn() != null && streamer.getUseYn().equals("Y");
     }
 
-    public void delete(Streamer streamer) {
+    public void deleteByAccountId(Streamer streamer) {
         StreamerEntity streamerEntity = streamerRepository.findByPlatformAndAccountId(streamer.getPlatform().toString(), streamer.getAccountId())
-                .orElseThrow(() -> new ApiException(ResponseCode.INVALID_PARAMETER));
+                .orElseThrow(() -> new ApiException(ResponseCode.STREAMER_NOT_FOUND));
         streamerRepository.delete(streamerEntity);
         streamerList.stream()
                 .filter(s -> s.getPlatform().equals(streamer.getPlatform()) && s.getAccountId().equals(streamer.getAccountId()))
+                .findFirst()
+                .ifPresent(streamerList::remove);
+    }
+
+    public void deleteByUserName(Streamer streamer) {
+        StreamerEntity streamerEntity = streamerRepository.findByPlatformAndUserName(streamer.getPlatform().toString(), streamer.getUserName())
+                .orElseThrow(() -> new ApiException(ResponseCode.STREAMER_NOT_FOUND));
+        streamerRepository.delete(streamerEntity);
+        streamerList.stream()
+                .filter(s -> s.getPlatform().equals(streamer.getPlatform()) && s.getUserName().equals(streamer.getUserName()))
                 .findFirst()
                 .ifPresent(streamerList::remove);
     }
