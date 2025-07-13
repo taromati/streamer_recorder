@@ -6,11 +6,14 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 
+@Slf4j
 @Getter
 @JsonIgnoreProperties(value = {"process"})
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -51,7 +54,7 @@ public class Streamer {
     }
 
     public String[] getCommand(String fileDir, SoopOption soopOption) {
-        return switch (platform) {
+        String[] command = switch (platform) {
             case TWITCH, TWITCASTING, YOUTUBE -> new String[]{"streamlink", recordUrl(), "best", "-o", makeFilePath(fileDir)};
             case SOOP -> {
                 if (soopOption == null) {
@@ -60,8 +63,12 @@ public class Streamer {
                     yield new String[]{"streamlink", "--ffmpeg-copyts", recordUrl(), "best", "-o", makeFilePath(fileDir), "--soop-username", soopOption.getUsername(), "--soop-password", soopOption.getPassword(), "--soop-purge-credentials"};
                 }
             }
-            case CHZZK -> new String[]{"streamlink", "--plugin-dirs", "./plugins", "--ffmpeg-copyts", recordUrl(), "best", "-o", makeFilePath(fileDir)};
+//            case CHZZK -> new String[]{"streamlink", "--plugin-dirs", "./plugins", "--ffmpeg-copyts", recordUrl(), "best", "-o", makeFilePath(fileDir)};
+            case CHZZK -> new String[]{"streamlink", "--ffmpeg-copyts", recordUrl(), "best", "-o", makeFilePath(fileDir)};
             default -> throw new IllegalStateException(STR."Unexpected value: \{platform}");
         };
+
+        log.trace("Command: {}", Arrays.toString(command));
+        return command;
     }
 }

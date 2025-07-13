@@ -19,11 +19,19 @@ Streamer-Recorder를 이용하여 인터넷 방송을 지속적으로 녹화할 
 
 1. application.yml.example → application.yml 로 변경 및 내용 수정
    ```yml
-    record: 
-        file-dir: C:\Users\user\Desktop //저장될 폴더 위치 
-        afreeca: 
-            username: //아프리카 아이디 
-            password: //아프리카 비밀번호
+   discord: # 디스코드 봇 설정
+      token:
+      server-name:
+      channel-name:
+   logging: # 로깅 설정
+      level:
+         me.taromati.streamerrecorder: INFO # 상세로그를 보고싶을 때 DEBUG로 변경
+         org.springframework: WARN
+   record:
+      file-dir: /PATH/TO/YOUR/RECORD/DIR #저장될 폴더 위치
+      soop:
+         username: YOUR_USERNAME #아프리카 아이디
+         password: YOUR_PASSWORD #아프리카 비밀번호
     ```
 2. jar 파일과 application.yml 파일을 같은 폴더에 위치
    - jar 파일은 build/libs/ 폴더에 위치
@@ -35,7 +43,7 @@ Streamer-Recorder를 이용하여 인터넷 방송을 지속적으로 녹화할 
 1. [http://localhost:6060](http://localhost:6060) 혹은 [http://127.0.0.1:6060](http://127.0.0.1:6060) 접속
 2. 녹화할 스트리머 정보 입력 후 저장
    ```
-   플랫폼 종류: TWITCH, CHZZK, AFREECA, TWITCASTING
+   플랫폼 종류: CHZZK, AFREECA, TWITCASTING, TWITCH
    user_id: 각 플랫폼별 스트리머 고유값
    user_name: 녹화 파일에 넣을 스트리머명
    ```

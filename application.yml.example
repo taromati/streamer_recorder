@@ -2,6 +2,10 @@ discord:
   token:
   server-name:
   channel-name:
+logging:
+  level:
+    me.taromati.streamerrecorder: DEBUG
+    org.springframework: WARN
 record:
   file-dir: /PATH/TO/YOUR/RECORD/DIR
   soop:
