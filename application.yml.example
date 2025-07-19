@@ -8,6 +8,10 @@ logging:
     org.springframework: WARN
 record:
   file-dir: /PATH/TO/YOUR/RECORD/DIR
+  use-transform-mp4: true
   soop:
     username: YOUR_USERNAME
     password: YOUR_PASSWORD
+  chzzk:
+    NID_AUT: Cookie value for NID_AUT
+    NID_SES: Cookie value for NID_SES

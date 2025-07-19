@@ -35,54 +35,86 @@ public class RecordScheduler {
                 Thread.startVirtualThread(() -> {
                     try {
                         log.info("Live Check: {}, {}", streamer.getUserName(), streamer.getPlatform());
-                        boolean isLive = switch (streamer.getPlatform()) {
-                            case CHZZK -> ChzzkApi.isLive(streamer.getAccountId());
-                            case SOOP -> SoopApi.isLive(streamer.getAccountId());
-                            case TWITCASTING -> TwitcastingApi.isLive(streamer.getAccountId());
-                            default -> true;
+                        String liveTitle = switch (streamer.getPlatform()) {
+                            case CHZZK -> ChzzkApi.isLiveNGetLiveTitle(streamer.getAccountId());
+                            case SOOP -> SoopApi.isLiveNGetLiveTitle(streamer.getAccountId());
+                            case TWITCASTING -> TwitcastingApi.isLiveNGetLiveTitle(streamer.getAccountId());
+                            default -> null;
                         };
-                        log.info("Live Check Result: {}, {}, {}", streamer.getUserName(), streamer.getPlatform(), isLive);
-                        if (isLive) {
-                            discordBot.sendMessage("방송 시작: " + streamer.getUserName() + " (" + streamer.getPlatform() + ")");
-                            ProcessBuilder pb = switch (streamer.getPlatform()) {
-                                case SOOP -> new ProcessBuilder(streamer.getCommand(recordConfigProperties.getFileDir(), recordConfigProperties.getSoopOption()));
-                                default -> new ProcessBuilder(streamer.getCommand(recordConfigProperties.getFileDir(), null));
-                            };
-                            pb.redirectErrorStream(true);
-                            Process p = pb.start();
-                            streamer.setProcess(p);
+                        log.info("Live Check Result: {}, {}, {}", streamer.getUserName(), streamer.getPlatform(), liveTitle);
+                        if (liveTitle == null || liveTitle.isEmpty()) {
+                            return; // 방송이 시작되지 않았거나, 방송 제목을 가져오지 못한 경우
+                        }
 
-                            // 종료 훅 등록
-                            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                                if (p != null && p.isAlive()) {
-                                    log.info("애플리케이션 종료: 외부 프로세스 정상 종료 시도 - {}, {}", streamer.getUserName(), streamer.getPlatform());
-                                    p.destroy();
-                                    try {
-                                        p.waitFor();
-                                    } catch (InterruptedException e) {
-                                        p.destroyForcibly();
-                                    }
-                                    log.info("외부 프로세스 종료 완료 - {}, {}", streamer.getUserName(), streamer.getPlatform());
-                                }
-                            }));
+                        discordBot.sendMessage("방송 시작: " + streamer.getUserName() + " (" + streamer.getPlatform() + ") - " + liveTitle);
+                        String tsFilePath = RecordUtil.makeFilePath(streamer, recordConfigProperties.getFileDir(), "ts");
 
-                            // 프로세스 로그 읽기
-                            try (var reader = new java.io.BufferedReader(new java.io.InputStreamReader(p.getInputStream()))) {
-                                String line;
-                                while ((line = reader.readLine()) != null) {
-                                    log.debug("[{}][{}] {}", streamer.getUserName(), streamer.getPlatform(), line);
+                        ProcessBuilder streamlinkPb = switch (streamer.getPlatform()) {
+                            case SOOP -> new ProcessBuilder(RecordUtil.getRecordCommand(streamer, tsFilePath, recordConfigProperties.getSoop(), null));
+                            case CHZZK -> new ProcessBuilder(RecordUtil.getRecordCommand(streamer, tsFilePath, null, recordConfigProperties.getChzzk()));
+                            default -> new ProcessBuilder(RecordUtil.getRecordCommand(streamer, tsFilePath, null, null));
+                        };
+                        streamlinkPb.redirectErrorStream(true);
+                        Process p = streamlinkPb.start();
+                        streamer.setProcess(p);
+
+                        // 종료 훅 등록
+                        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                            if (p != null && p.isAlive()) {
+                                log.info("애플리케이션 종료: 외부 프로세스 정상 종료 시도 - {}, {}", streamer.getUserName(), streamer.getPlatform());
+                                p.destroy();
+                                try {
+                                    p.waitFor();
+                                } catch (InterruptedException e) {
+                                    p.destroyForcibly();
                                 }
+                                log.info("외부 프로세스 종료 완료 - {}, {}", streamer.getUserName(), streamer.getPlatform());
                             }
+                        }));
 
-                            // 프로세스가 종료될 때까지 대기
-                            int exitCode = p.waitFor();
-                            log.info("녹화 프로세스 종료: {}, {}, exitCode={}", streamer.getUserName(), streamer.getPlatform(), exitCode);
-                            discordBot.sendMessage("방송 종료: " + streamer.getUserName() + " (" + streamer.getPlatform() + ") - 종료 코드: " + exitCode);
-                            streamer.setProcess(null);
+                        // Streamlink 프로세스 로그 읽기
+                        try (var reader = new java.io.BufferedReader(new java.io.InputStreamReader(p.getInputStream()))) {
+                            String line;
+                            while ((line = reader.readLine()) != null) {
+                                log.debug("[Streamlink][{}][{}] {}", streamer.getUserName(), streamer.getPlatform(), line);
+                            }
+                        }
+
+                        // 프로세스가 종료될 때까지 대기
+                        int exitCode = p.waitFor();
+                        log.info("녹화 프로세스 종료: {}, {}, exitCode={}", streamer.getUserName(), streamer.getPlatform(), exitCode);
+                        discordBot.sendMessage("방송 종료: " + streamer.getUserName() + " (" + streamer.getPlatform() + ") - 종료 코드: " + exitCode);
+                        streamer.setProcess(null);
+
+                        if (recordConfigProperties.getUseTransformMp4()) {
+                            // ffmpeg 변환을 별도의 쓰레드에서 실행
+                            Thread.startVirtualThread(() -> {
+                                try {
+                                    log.info("ffmpeg 변환 시작: {}, {}", streamer.getUserName(), streamer.getPlatform());
+                                    ProcessBuilder ffmpegPb = new ProcessBuilder(RecordUtil.getFfmpegTransformCommand(tsFilePath));
+                                    ffmpegPb.redirectErrorStream(true);
+                                    Process ffmpegProcess = ffmpegPb.start();
+
+                                    // ffmpeg 프로세스 로그 읽기
+                                    try (var reader = new java.io.BufferedReader(new java.io.InputStreamReader(ffmpegProcess.getInputStream()))) {
+                                        String line;
+                                        while ((line = reader.readLine()) != null) {
+                                            System.out.println("[ffmpeg] " + line);
+                                        }
+                                    }
+                                    int ffmpegExitCode = ffmpegProcess.waitFor();
+                                    log.info("ffmpeg 변환 완료: {}, {}, exitCode={}", streamer.getUserName(), streamer.getPlatform(), ffmpegExitCode);
+                                    discordBot.sendMessage("mp4 변환 완료: " + streamer.getUserName() + " (" + streamer.getPlatform() + ") - ffmpeg 종료 코드: " + ffmpegExitCode);
+                                } catch (Exception e) {
+                                    log.error("[RecordScheduler][ffmpeg] error : {}", streamer.getUserName(), e);
+                                    discordBot.sendMessage("mp4 변환 오류: " + streamer.getUserName() + " (" + streamer.getPlatform() + ") - \n" + e.getMessage());
+                                }
+                            });
                         }
                     } catch (Exception e) {
                         log.error("[RecordScheduler] error : {}", streamer.getUserName(), e);
                         streamer.setProcess(null);
+                        discordBot.sendMessage("녹화 오류: " + streamer.getUserName() + " (" + streamer.getPlatform() + ") - \n" + e.getMessage());
                     }
                 });
             }

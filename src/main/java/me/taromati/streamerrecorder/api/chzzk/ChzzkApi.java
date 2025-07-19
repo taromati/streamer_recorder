@@ -15,12 +15,16 @@ import java.util.Objects;
 public class ChzzkApi {
     public static ObjectMapper objectMapper = new ObjectMapper();
 
-    public static boolean isLive(String id) {
+    public static String isLiveNGetLiveTitle(String id) {
         ChzzkLiveStatus chzzkLiveStatus = getLiveStatus(id);
         if (chzzkLiveStatus == null || chzzkLiveStatus.getContent() == null) {
-            return false;
+            return null;
         }
-        return Objects.equals(chzzkLiveStatus.getContent().getStatus(), ChzzkConstants.LiveStatus.OPEN.getValue());
+        if (Objects.equals(chzzkLiveStatus.getContent().getStatus(), ChzzkConstants.LiveStatus.OPEN.getValue())) {
+            return chzzkLiveStatus.getContent().getLiveTitle();
+        } else {
+            return null;
+        }
     }
     public static String getChatChannelId(String id) {
         ChzzkLiveStatus chzzkLiveStatus = getLiveStatus(id);

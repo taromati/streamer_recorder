@@ -17,12 +17,16 @@ import java.util.Map;
 @Slf4j
 public class SoopApi {
 
-    public static boolean isLive(String bjid) {
+    public static String isLiveNGetLiveTitle(String bjid) {
         SoopLiveInfo soopLiveInfo = getPlayerLive(bjid);
         if (soopLiveInfo == null) {
-            return false;
+            return null;
         }
-        return soopLiveInfo.CHDOMAIN() != null && soopLiveInfo.CHPT() != null;
+        if (soopLiveInfo.CHDOMAIN() != null && soopLiveInfo.CHPT() != null) {
+            return soopLiveInfo.TITLE();
+        } else {
+            return null;
+        }
     }
 
     public static SoopLiveInfo getPlayerLive(String bjid) {

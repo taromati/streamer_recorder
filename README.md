@@ -29,9 +29,13 @@ Streamer-Recorder를 이용하여 인터넷 방송을 지속적으로 녹화할 
          org.springframework: WARN
    record:
       file-dir: /PATH/TO/YOUR/RECORD/DIR #저장될 폴더 위치
+      use-transform-mp4: true # 방송종료 후 mp4 변환 사용 여부
       soop:
          username: YOUR_USERNAME #아프리카 아이디
          password: YOUR_PASSWORD #아프리카 비밀번호
+      chzzk:
+         NID_AUT: Cookie value for NID_AUT #치지직 쿠키
+         NID_SES: Cookie value for NID_SES #치지직 쿠키
     ```
 2. jar 파일과 application.yml 파일을 같은 폴더에 위치
    - jar 파일은 build/libs/ 폴더에 위치

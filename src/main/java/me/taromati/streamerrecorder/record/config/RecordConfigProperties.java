@@ -2,7 +2,6 @@ package me.taromati.streamerrecorder.record.config;
 
 import lombok.Getter;
 import lombok.Setter;
-import me.taromati.streamerrecorder.record.vo.SoopOption;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,7 +11,9 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix="record")
 public class RecordConfigProperties {
     private String fileDir;
+    private Boolean useTransformMp4;
     private Soop soop;
+    private Chzzk chzzk;
 
     @Getter
     @Setter
@@ -21,16 +22,10 @@ public class RecordConfigProperties {
         private String password;
     }
 
-    public SoopOption getSoopOption() {
-        if (soop == null
-                || soop.getUsername() == null || soop.getUsername().isEmpty()
-                || soop.getPassword() == null || soop.getPassword().isEmpty()
-        ) {
-            return null;
-        }
-        return SoopOption.builder()
-                .username(soop.getUsername())
-                .password(soop.getPassword())
-                .build();
+    @Getter
+    @Setter
+    public static class Chzzk {
+        private String NID_AUT;
+        private String NID_SES;
     }
 }
