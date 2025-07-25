@@ -1,16 +1,19 @@
 package me.taromati.streamerrecorder.api.chzzk.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ChzzkLiveStatus {
     private String code;
     private String message;
     private Content content;
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Content {
         private String liveTitle;
         private String status;

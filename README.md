@@ -39,7 +39,7 @@ Streamer-Recorder를 이용하여 인터넷 방송을 지속적으로 녹화할 
     ```
 2. jar 파일과 application.yml 파일을 같은 폴더에 위치
    - jar 파일은 build/libs/ 폴더에 위치
-3. 터미널에서 `java --enable-preview -jar streamer-recorder-1.2.0.jar` 실행
+3. 터미널에서 `java --enable-preview -jar streamer-recorder-1.3.0.jar` 실행
 
 
 ## **사용 방법**
