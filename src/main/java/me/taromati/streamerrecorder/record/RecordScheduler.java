@@ -11,6 +11,7 @@ import me.taromati.streamerrecorder.api.chzzk.ChzzkApi;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.util.List;
 
 @Slf4j
@@ -105,6 +106,19 @@ public class RecordScheduler {
                                     int ffmpegExitCode = ffmpegProcess.waitFor();
                                     log.info("ffmpeg 변환 완료: {}, {}, exitCode={}", streamer.getUserName(), streamer.getPlatform(), ffmpegExitCode);
                                     discordBot.sendMessage("mp4 변환 완료: " + streamer.getUserName() + " (" + streamer.getPlatform() + ") - ffmpeg 종료 코드: " + ffmpegExitCode);
+                                    // 변환 후 ts 파일 삭제
+                                    try {
+                                        File tsFile = new File(tsFilePath);
+                                        if (tsFile.exists() && tsFile.delete()) {
+                                            log.info("TS 파일 삭제 성공: {}", tsFilePath);
+                                        } else {
+                                            discordBot.sendMessage("TS 파일 삭제 실패 또는 파일이 존재하지 않음: " + tsFilePath);
+                                            log.warn("TS 파일 삭제 실패 또는 파일이 존재하지 않음: {}", tsFilePath);
+                                        }
+                                    } catch (Exception e) {
+                                        log.error("TS 파일 삭제 중 오류 발생: {}", tsFilePath, e);
+                                        discordBot.sendMessage("TS 파일 삭제 중 오류 발생: " + tsFilePath + " - " + e.getMessage());
+                                    }
                                 } catch (Exception e) {
                                     log.error("[RecordScheduler][ffmpeg] error : {}", streamer.getUserName(), e);
                                     discordBot.sendMessage("mp4 변환 오류: " + streamer.getUserName() + " (" + streamer.getPlatform() + ") - \n" + e.getMessage());
