@@ -38,7 +38,7 @@ public class TwitcastingApi {
             String movieId = String.valueOf(idNode.asLong());
             String token = getToken(movieId, streamer);
             if (token == null) {
-                return null;
+                return "UnknownTitle";
             }
             return getTitle(movieId, token, streamer);
         } catch (Exception e) {

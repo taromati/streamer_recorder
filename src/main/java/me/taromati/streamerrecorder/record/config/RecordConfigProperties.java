@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 public class RecordConfigProperties {
     private String fileDir;
     private Boolean useTransformMp4;
+    private Boolean deleteTs;
     private Soop soop;
     private Chzzk chzzk;
 

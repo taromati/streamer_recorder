@@ -9,6 +9,7 @@ logging:
 record:
   file-dir: /PATH/TO/YOUR/RECORD/DIR
   use-transform-mp4: true
+  delete-ts: false
   soop:
     username: YOUR_USERNAME
     password: YOUR_PASSWORD

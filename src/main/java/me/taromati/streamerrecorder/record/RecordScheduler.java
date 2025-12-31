@@ -48,14 +48,14 @@ public class RecordScheduler {
                         }
 
                         discordBot.sendMessage("방송 시작: " + streamer.getUserName() + " (" + streamer.getPlatform() + ") - " + liveTitle);
-                        String tsFilePath = RecordUtil.makeFilePath(streamer, recordConfigProperties.getFileDir(), "ts");
+                        String tsFilePath = RecordUtil.makeFilePath(streamer, recordConfigProperties.getFileDir(), liveTitle, "ts");
 
                         ProcessBuilder streamlinkPb = switch (streamer.getPlatform()) {
                             case SOOP -> new ProcessBuilder(RecordUtil.getRecordCommand(streamer, tsFilePath, recordConfigProperties.getSoop(), null));
                             case CHZZK -> new ProcessBuilder(RecordUtil.getRecordCommand(streamer, tsFilePath, null, recordConfigProperties.getChzzk()));
                             default -> new ProcessBuilder(RecordUtil.getRecordCommand(streamer, tsFilePath, null, null));
                         };
-                        streamlinkPb.redirectErrorStream(true);
+//                        streamlinkPb.redirectErrorStream(true);
                         Process p = streamlinkPb.start();
                         streamer.setProcess(p);
 
@@ -74,12 +74,12 @@ public class RecordScheduler {
                         }));
 
                         // Streamlink 프로세스 로그 읽기
-                        try (var reader = new java.io.BufferedReader(new java.io.InputStreamReader(p.getInputStream()))) {
-                            String line;
-                            while ((line = reader.readLine()) != null) {
-                                log.debug("[Streamlink][{}][{}] {}", streamer.getUserName(), streamer.getPlatform(), line);
-                            }
-                        }
+//                        try (var reader = new java.io.BufferedReader(new java.io.InputStreamReader(p.getInputStream()))) {
+//                            String line;
+//                            while ((line = reader.readLine()) != null) {
+//                                log.debug("[Streamlink][{}][{}] {}", streamer.getUserName(), streamer.getPlatform(), line);
+//                            }
+//                        }
 
                         // 프로세스가 종료될 때까지 대기
                         int exitCode = p.waitFor();
@@ -106,18 +106,20 @@ public class RecordScheduler {
                                     int ffmpegExitCode = ffmpegProcess.waitFor();
                                     log.info("ffmpeg 변환 완료: {}, {}, exitCode={}", streamer.getUserName(), streamer.getPlatform(), ffmpegExitCode);
                                     discordBot.sendMessage("mp4 변환 완료: " + streamer.getUserName() + " (" + streamer.getPlatform() + ") - ffmpeg 종료 코드: " + ffmpegExitCode);
-                                    // 변환 후 ts 파일 삭제
-                                    try {
-                                        File tsFile = new File(tsFilePath);
-                                        if (tsFile.exists() && tsFile.delete()) {
-                                            log.info("TS 파일 삭제 성공: {}", tsFilePath);
-                                        } else {
-                                            discordBot.sendMessage("TS 파일 삭제 실패 또는 파일이 존재하지 않음: " + tsFilePath);
-                                            log.warn("TS 파일 삭제 실패 또는 파일이 존재하지 않음: {}", tsFilePath);
+                                    if (recordConfigProperties.getDeleteTs()) {
+                                        // 변환 후 ts 파일 삭제
+                                        try {
+                                            File tsFile = new File(tsFilePath);
+                                            if (tsFile.exists() && tsFile.delete()) {
+                                                log.info("TS 파일 삭제 성공: {}", tsFilePath);
+                                            } else {
+                                                discordBot.sendMessage("TS 파일 삭제 실패 또는 파일이 존재하지 않음: " + tsFilePath);
+                                                log.warn("TS 파일 삭제 실패 또는 파일이 존재하지 않음: {}", tsFilePath);
+                                            }
+                                        } catch (Exception e) {
+                                            log.error("TS 파일 삭제 중 오류 발생: {}", tsFilePath, e);
+                                            discordBot.sendMessage("TS 파일 삭제 중 오류 발생: " + tsFilePath + " - " + e.getMessage());
                                         }
-                                    } catch (Exception e) {
-                                        log.error("TS 파일 삭제 중 오류 발생: {}", tsFilePath, e);
-                                        discordBot.sendMessage("TS 파일 삭제 중 오류 발생: " + tsFilePath + " - " + e.getMessage());
                                     }
                                 } catch (Exception e) {
                                     log.error("[RecordScheduler][ffmpeg] error : {}", streamer.getUserName(), e);

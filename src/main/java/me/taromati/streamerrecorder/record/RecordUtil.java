@@ -22,13 +22,13 @@ public class RecordUtil {
         };
     }
 
-    public static String makeFilePath(Streamer streamer, String fileDir, String extension) {
+    public static String makeFilePath(Streamer streamer, String fileDir, String liveTitle, String extension) {
         if (extension == null) {
             extension = "ts"; // 기본 확장자 설정
         }
 
         String dateTimeString = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss.SSS"));
-        return Paths.get(fileDir, streamer.getUserName(), STR."\{dateTimeString}-\{streamer.getPlatform().name()}-\{streamer.getUserName()}.\{extension}").toString();
+        return Paths.get(fileDir, streamer.getUserName(), STR."\{dateTimeString}-\{streamer.getPlatform().name()}-\{streamer.getUserName()}-\{liveTitle}.\{extension}").toString();
     }
 
     public static String transFileExtension(String filePath, String extension) {
